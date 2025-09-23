@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赤石UI - 增强版（含垃圾特性）</title>
+    <style>
+        /* 基础样式 - 故意添加更多不完美 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: filter 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        
+        /* 抽象动画曲线 */
+        @keyframes garbage-animation {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            25% { transform: translate(10px, -5px) rotate(5deg) scale(1.02); }
+            50% { transform: translate(-5px, 10px) rotate(-3deg) scale(0.98); }
+            75% { transform: translate(8px, 8px) rotate(2deg) scale(1.01); }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+        }
+        
+        @keyframes wobble {
+            0% { transform: translateX(0%); }
+            15% { transform: translateX(-5%) rotate(-5deg); }
+            30% { transform: translateX(4%) rotate(3deg); }
+            45% { transform: translateX(-3%) rotate(-3deg); }
+            60% { transform: translateX(2%) rotate(2deg); }
+            75% { transform: translateX(-1%) rotate(-1deg); }
+            100% { transform: translateX(0%); }
+        }
+        
+        @keyframes color-shift {
+            0% { background-color: #f8c9c9; }
+            25% { background-color: #c9f8d0; }
+            50% { background-color: #c9d6f8; }
+            75% { background-color: #f8f0c9; }
+            100% { background-color: #f8c9c9; }
+        }
+        
+        .garbage-animated {
+            animation: garbage-animation 3s infinite ease-in-out;
+        }
+        
+        .wobble {
+            animation: wobble 2s infinite;
+        }
+        
+        .color-shift {
+            animation: color-shift 5s infinite;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e74c3c;
+        }
+        
+        h1 {
+            color: #e74c3c;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            animation: wobble 5s infinite;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin: 20px 0 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h3 {
+            color: #2c3e50;
+            margin: 15px 0 10px;
+        }
+        
+        /* 导航栏 */
+        .navbar {
+            background: #2c3e50;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            filter: blur(0.5px);
+        }
+        
+        .navbar a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .navbar a:hover {
+            background-color: #34495e;
+            transform: scale(1.1) rotate(3deg);
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05) rotate(1deg);
+            filter: blur(0.3px);
+        }
+        
+        /* 表单控件 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            transform: scale(1.02);
+            filter: blur(0.2px);
+        }
+        
+        /* 卡片组件 */
+        .card {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px) rotate(0.5deg);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* 表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+            transform: scale(1.01);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        /* 警告框 */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            animation: garbage-animation 4s infinite;
+        }
+        
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+        }
+        
+        /* 进度条 */
+        .progress {
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+            transition: width 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        
+        .progress.reverse .progress-bar {
+            transition: width 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+        }
+        
+        /* 标签 */
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 0 5px;
+            animation: wobble 3s infinite;
+        }
+        
+        .badge-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .badge-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .badge-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            list-style: none;
+            padding: 0;
+        }
+        
+        .pagination li {
+            margin: 0 5px;
+        }
+        
+        .pagination a {
+            display: block;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            color: #3498db;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .pagination a.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+            animation: garbage-animation 2s infinite;
+        }
+        
+        .pagination a:hover {
+            transform: scale(1.1) rotate(3deg);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .navbar a {
+                float: none;
+                display: block;
+                text-align: left;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+        }
+        
+        /* 刻意添加的质量问题 */
+        .quality-issue-1 {
+            /* 不一致的边距 */
+            margin: 10px 5px 15px 8px;
+        }
+        
+        .quality-issue-2 {
+            /* 奇怪的字体大小 */
+            font-size: 17.3px;
+        }
+        
+        .quality-issue-3 {
+            /* 不标准的颜色 */
+            background-color: #f8c9c9;
+        }
+        
+        /* 网格系统 */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+        
+        .col {
+            flex: 1;
+            padding: 0 10px;
+        }
+        
+        .col-6 {
+            flex: 0 0 50%;
+            padding: 0 10px;
+        }
+        
+        .col-4 {
+            flex: 0 0 33.333%;
+            padding: 0 10px;
+        }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+            animation: garbage-animation 3s infinite;
+        }
+        
+        .close {
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        /* 点击计数器 */
+        .click-counter {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 1001;
+        }
+        
+        /* 重载提示 */
+        .reload-notice {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            z-index: 1002;
+            text-align: center;
+            animation: wobble 0.5s infinite;
+        }
+        
+        /* 垃圾特效类 */
+        .garbage-effect {
+            filter: blur(1px) hue-rotate(90deg);
+            transform: skew(2deg, 1deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="click-counter">点击次数: <span id="clickCount">0</span>/4</div>
+    <div class="reload-notice" id="reloadNotice">
+        <h2>系统即将重载！</h2>
+        <p>点击了4次控件，系统正在重载...</p>
+    </div>
+    
+    <div class="container" id="mainContainer">
+        <header>
+            <h1>赤石UI系统 - 增强版</h1>
+            <p>质量极差但功能全 - 体验独特 - 性能消耗强大 - 含垃圾特性</p>
+        </header>
+        
+        <nav class="navbar">
+            <a href="#buttons">按钮</a>
+            <a href="#forms">表单</a>
+            <a href="#cards">卡片</a>
+            <a href="#tables">表格</a>
+            <a href="#alerts">警告</a>
+            <a href="#progress">进度条</a>
+            <a href="#badges">标签</a>
+            <a href="#pagination">分页</a>
+        </nav>
+        
+        <section id="buttons">
+            <h2>按钮控件</h2>
+            <div class="card garbage-animated">
+                <button class="btn btn-primary">主要按钮</button>
+                <button class="btn btn-success">成功按钮</button>
+                <button class="btn btn-danger">危险按钮</button>
+                <button class="btn btn-warning">警告按钮</button>
+                <button class="btn" style="background-color: #9b59b6; color: white;">自定义按钮</button>
+                <button class="btn" id="reverseProgressBtn">倒退进度条按钮</button>
+            </div>
+        </section>
+        
+        <section id="forms">
+            <h2>表单控件</h2>
+            <div class="card wobble">
+                <div class="form-group">
+                    <label for="name">姓名</label>
+                    <input type="text" id="name" placeholder="请输入您的姓名">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">邮箱</label>
+                    <input type="email" id="email" placeholder="请输入您的邮箱">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" placeholder="请输入密码">
+                </div>
+                
+                <div class="form-group">
+                    <label for="gender">性别</label>
+                    <select id="gender">
+                        <option value="">请选择</option>
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>爱好</label>
+                    <div>
+                        <input type="checkbox" id="sports">
+                        <label for="sports" style="display: inline; font-weight: normal;">运动</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="music">
+                        <label for="music" style="display: inline; font-weight: normal;">音乐</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="reading">
+                        <label for="reading" style="display: inline; font-weight: normal;">阅读</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>支付方式</label>
+                    <div>
+                        <input type="radio" id="alipay" name="payment" checked>
+                        <label for="alipay" style="display: inline; font-weight: normal;">支付宝</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="wechat" name="payment">
+                        <label for="wechat" style="display: inline; font-weight: normal;">微信支付</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="bank" name="payment">
+                        <label for="bank" style="display: inline; font-weight: normal;">银行转账</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">留言</label>
+                    <textarea id="message" rows="4" placeholder="请输入您的留言"></textarea>
+                </div>
+                
+                <button class="btn btn-primary">提交表单</button>
+            </div>
+        </section>
+        
+        <section id="cards">
+            <h2>卡片组件</h2>
+            <div class="row">
+                <div class="col-4">
+                    <div class="card color-shift">
+                        <h3>产品卡片</h3>
+                        <p>这是一个产品描述，展示了卡片组件的使用方式。</p>
+                        <button class="btn btn-primary">查看详情</button>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card quality-issue-3 garbage-animated">
+                        <h3>用户卡片</h3>
+                        <p>这是一个用户信息卡片，带有一些质量问题。</p>
+                        <button class="btn btn-success">关注</button>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card">
+                        <h3>新闻卡片</h3>
+                        <p>这是一条新闻摘要，展示了不同类型的卡片。</p>
+                        <button class="btn btn-warning">阅读更多</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="tables">
+            <h2>表格控件</h2>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>姓名</th>
+                            <th>邮箱</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>张三</td>
+                            <td>zhangsan@example.com</td>
+                            <td><span class="badge badge-success">活跃</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>李四</td>
+                            <td>lisi@example.com</td>
+                            <td><span class="badge badge-warning">待审核</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>王五</td>
+                            <td>wangwu@example.com</td>
+                            <td><span class="badge badge-danger">禁用</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section id="alerts">
+            <h2>警告框</h2>
+            <div class="alert alert-success">
+                <strong>成功!</strong> 操作已成功完成。
+            </div>
+            <div class="alert alert-danger">
+                <strong>错误!</strong> 发生了一个错误，请重试。
+            </div>
+            <div class="alert alert-warning quality-issue-2">
+                <strong>警告!</strong> 这是一个警告信息，字体大小可能不太标准。
+            </div>
+        </section>
+        
+        <section id="progress">
+            <h2>进度条</h2>
+            <div class="card">
+                <h3>默认进度条</h3>
+                <div class="progress">
+                    <div class="progress-bar" id="progressBar1" style="width: 25%;">25%</div>
+                </div>
+                
+                <h3>成功进度条</h3>
+                <div class="progress">
+                    <div class="progress-bar" id="progressBar2" style="width: 50%; background-color: #2ecc71;">50%</div>
+                </div>
+                
+                <h3>倒退进度条 (点击按钮使其倒退)</h3>
+                <div class="progress reverse">
+                    <div class="progress-bar" id="reverseProgressBar" style="width: 100%; background-color: #e74c3c;">100%</div>
+                </div>
+                <button class="btn btn-danger" id="reverseBtn">点击倒退10%</button>
+            </div>
+        </section>
+        
+        <section id="badges">
+            <h2>标签</h2>
+            <div class="card">
+                <p>这是一个<span class="badge badge-primary">主要</span>标签的例子。</p>
+                <p>这是一个<span class="badge badge-success">成功</span>标签的例子。</p>
+                <p>这是一个<span class="badge badge-danger">危险</span>标签的例子。</p>
+                <p class="quality-issue-1">这个段落有<span class="badge badge-primary">不一致的边距</span>问题。</p>
+            </div>
+        </section>
+        
+        <section id="pagination">
+            <h2>分页控件</h2>
+            <div class="card">
+                <ul class="pagination">
+                    <li><a href="#">«</a></li>
+                    <li><a href="#" class="active">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                    <li><a href="#">»</a></li>
+                </ul>
+            </div>
+        </section>
+        
+        <section>
+            <h2>模态框示例</h2>
+            <div class="card">
+                <button class="btn btn-primary" onclick="openModal()">打开模态框</button>
+            </div>
+        </section>
+        
+        <footer style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+            <p>赤石UI系统 - 质量极差但功能全 © 2023</p>
+            <p>特性：抽象动画曲线 | 模糊效果 | 点击4次重载 | 倒退进度条</p>
+        </footer>
+    </div>
+    
+    <!-- 模态框 -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>模态框标题</h2>
+            <p>这是一个模态框的例子，点击右上角的X或模态框外部可以关闭。</p>
+            <button class="btn btn-primary" onclick="closeModal()">关闭</button>
+        </div>
+    </div>
+    
+    <script>
+        // 点击计数器
+        let clickCount = 0;
+        const clickCounter = document.getElementById('clickCount');
+        const reloadNotice = document.getElementById('reloadNotice');
+        const mainContainer = document.getElementById('mainContainer');
+        
+        // 为所有可点击元素添加点击事件
+        document.addEventListener('click', function(e) {
+            // 排除点击计数器本身
+            if (!e.target.closest('.click-counter')) {
+                clickCount++;
+                clickCounter.textContent = clickCount;
+                
+                // 随机添加垃圾效果
+                if (Math.random() > 0.7) {
+                    e.target.classList.add('garbage-effect');
+                    setTimeout(() => {
+                        e.target.classList.remove('garbage-effect');
+                    }, 1000);
+                }
+                
+                // 每点击一次，增加一点模糊
+                mainContainer.style.filter = `blur(${clickCount * 0.2}px)`;
+                
+                // 点击4次后触发重载
+                if (clickCount >= 4) {
+                    reloadNotice.style.display = 'block';
+                    mainContainer.style.filter = 'blur(10px)';
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                }
+            }
+        });
+        
+        // 倒退进度条功能
+        const reverseProgressBar = document.getElementById('reverseProgressBar');
+        const reverseBtn = document.getElementById('reverseBtn');
+        let progress = 100;
+        
+        reverseBtn.addEventListener('click', function() {
+            if (progress > 0) {
+                progress -= 10;
+                if (progress < 0) progress = 0;
+                reverseProgressBar.style.width = progress + '%';
+                reverseProgressBar.textContent = progress + '%';
+                
+                // 添加垃圾动画效果
+                reverseProgressBar.style.animation = 'none';
+                setTimeout(() => {
+                    reverseProgressBar.style.animation = 'garbage-animation 1s';
+                }, 10);
+            }
+        });
+        
+        // 简单的模态框控制
+        function openModal() {
+            document.getElementById('myModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('myModal').style.display = 'none';
+        }
+        
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            var modal = document.getElementById('myModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+        
+        // 添加更多"质量差"的交互效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 随机改变一些元素的样式
+            setInterval(function() {
+                var randomElements = document.querySelectorAll('.card, .btn, .alert');
+                for (var i = 0; i < randomElements.length; i++) {
+                    if (Math.random() > 0.8) { // 20%的概率
+                        randomElements[i].style.transform = 'rotate(' + (Math.random() * 4 - 2) + 'deg)';
+                    }
+                }
+            }, 2000);
+            
+            // 随机添加模糊效果
+            setInterval(function() {
+                var elements = document.querySelectorAll('h1, h2, h3, p');
+                var randomElement = elements[Math.floor(Math.random() * elements.length)];
+                randomElement.style.filter = 'blur(1px)';
+                setTimeout(function() {
+                    randomElement.style.filter = 'blur(0)';
+                }, 1000);
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
